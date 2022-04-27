@@ -13,7 +13,3 @@ node_modules/
 
 # Собранные файлы проекта
 build/
-
-#Файлы конфигурации
-webpack.config.js
-babel.config.json
