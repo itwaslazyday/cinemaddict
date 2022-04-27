@@ -11,4 +11,9 @@ Thumbs.db
 *.log*
 node_modules/
 
-# Собранные файлы (допишите самостоятельно)
+# Собранные файлы проекта
+build/
+
+#Файлы конфигурации
+webpack.config.js
+babel.config.json
