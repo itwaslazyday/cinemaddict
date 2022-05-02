@@ -3,7 +3,7 @@ import {humanizeTaskDueDate, humanizeMovieRuntime} from '../utils.js';
 
 
 const createMovieCardTemplate = (card) => {
-  const {filmInfo, userDetails, comments} = card;
+  const {id, filmInfo, userDetails, comments} = card;
   const getControlClassName = (option) => option
     ? 'film-card__controls-item--active'
     : '';
@@ -17,7 +17,7 @@ const createMovieCardTemplate = (card) => {
           <span class="film-card__duration">${humanizeMovieRuntime(filmInfo.runtime)}</span>
           <span class="film-card__genre">${filmInfo.genre}</span>
         </p>
-        <img src="./${filmInfo.poster}" alt="" class="film-card__poster">
+        <img src="./${filmInfo.poster}" data-id="${id}" alt="" class="film-card__poster">
         <p class="film-card__description">${filmInfo.description}</p>
         <span class="film-card__comments">${comments.length} comments</span>
       </a>

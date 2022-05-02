@@ -33,6 +33,12 @@ export default class MoviesPresenter {
     }
     render(new LoadMoreButtonView(), this.moviesList.getElement());
 
-    render(new PopupView(this.moviesCards[0], this.moviesComments,), siteFooterElement, RenderPosition.AFTEREND);
+    const moviesPosters = document.querySelectorAll('.film-card__poster');
+    moviesPosters.forEach((item) => item.addEventListener('click',
+      (evt) => {
+        //Позже будет иной алгоритм выбора объекта по id
+        render(new PopupView(this.moviesCards[evt.target.dataset.id], this.moviesComments), siteFooterElement, RenderPosition.AFTEREND);
+      }
+    ));
   };
 }

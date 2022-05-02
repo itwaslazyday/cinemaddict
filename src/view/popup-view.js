@@ -6,10 +6,11 @@ const createPopupTemplate = (card, commentsArr) => {
   const getControlClassName = (option) => option
     ? 'film-details__control-button--active'
     : '';
+  const selectedComments = commentsArr.filter(({id}) => comments.some((item) => item === id));
   const createCommentsTemplate = () => {
     const commentsList = document.createElement('ul');
     commentsList.classList.add('film-details__comments-list');
-    commentsArr.forEach((item) => {
+    selectedComments.forEach((item) => {
       commentsList.insertAdjacentHTML('beforeend',
         `<li class="film-details__comment">
           <span class="film-details__comment-emoji">
