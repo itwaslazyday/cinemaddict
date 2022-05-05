@@ -15,4 +15,7 @@ const humanizeMovieRuntime = (runTime) => {
   const runTimeInMinutes = runTime - runTimeInHours * 60;
   return runTime >= 60 ? `${runTimeInHours}h ${runTimeInMinutes}m` : `${runTimeInMinutes}m`;
 };
-export {getRandomInteger, humanizeTaskDueDate, humanizeMovieRuntime};
+
+const isEscapeKey = (evt) => evt.key === 'Escape';
+
+export {getRandomInteger, humanizeTaskDueDate, humanizeMovieRuntime, isEscapeKey};
