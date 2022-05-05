@@ -12,24 +12,6 @@ import {isEscapeKey} from '../utils.js';
 const pageBody = document.querySelector('body');
 const siteFooterElement = pageBody.querySelector('footer');
 
-const onPopupCloseClick = () => {
-  document.querySelector('.film-details').remove();
-  pageBody.classList.toggle('hide-overflow');
-};
-
-const onPopupEscPress = (evt) => {
-  if (isEscapeKey(evt)) {
-    evt.preventDefault();
-    onPopupCloseClick();
-  }
-};
-const setPopupWindow = (element) => {
-  pageBody.classList.toggle('hide-overflow');
-  const popupCloseButton = element.querySelector('.film-details__close-btn');
-  popupCloseButton.addEventListener('click', onPopupCloseClick, {once: true});
-  document.addEventListener('keydown', onPopupEscPress, {once: true});
-};
-
 export default class MoviesPresenter {
   #moviesBlock = new MoviesBlockView();
   #moviesList = new MoviesListView();
@@ -62,7 +44,7 @@ export default class MoviesPresenter {
       (evt) => {
         if (evt.target.classList.contains('film-card__poster')) {
           if (document.querySelector('.film-details')) {
-            onPopupCloseClick();
+            this.#onPopupCloseClick();
           }
           const movieId = evt.target.dataset.id;
           this.#renderPopup(movieId);
@@ -77,8 +59,29 @@ export default class MoviesPresenter {
   };
 
   #renderPopup = (id) => {
+
+    const setPopupWindow = (element) => {
+      pageBody.classList.toggle('hide-overflow');
+      const popupCloseButton = element.querySelector('.film-details__close-btn');
+      popupCloseButton.addEventListener('click', this.#onPopupCloseClick, {once: true});
+      document.addEventListener('keydown', this.#onPopupEscPress);
+    };
+
     this.#moviePopup = new PopupView(this.#moviesCards[id], this.#moviesComments);
     render(this.#moviePopup, siteFooterElement, RenderPosition.AFTEREND);
     setPopupWindow(this.#moviePopup.element);
+  };
+
+  #onPopupCloseClick = () => {
+    document.querySelector('.film-details').remove();
+    pageBody.classList.toggle('hide-overflow');
+    document.removeEventListener('keydown', this.#onPopupEscPress);
+  };
+
+  #onPopupEscPress = (evt) => {
+    if (isEscapeKey(evt)) {
+      evt.preventDefault();
+      this.#onPopupCloseClick();
+    }
   };
 }
