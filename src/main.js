@@ -6,8 +6,8 @@ import MoviesPresenter from './presenter/movies-presenter.js';
 const siteHeaderElement = document.querySelector('header');
 const siteMainElement = document.querySelector('.main');
 const moviesModel = new MoviesModel();
-const moviesPresenter = new MoviesPresenter();
+const moviesPresenter = new MoviesPresenter(siteMainElement, moviesModel);
 
 render(new UserRatingView(), siteHeaderElement);
 
-moviesPresenter.init(siteMainElement, moviesModel);
+moviesPresenter.init();
