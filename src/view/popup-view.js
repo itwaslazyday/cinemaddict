@@ -1,5 +1,5 @@
-import {createElement} from '../render.js';
-import {humanizeTaskDueDate, humanizeMovieRuntime} from '../utils.js';
+import AbstractView from '../framework/view/abstract-view.js';
+import {humanizeTaskDueDate, humanizeMovieRuntime} from '../utils/movieDate.js';
 
 const createPopupTemplate = (card, commentsArr) => {
   const {filmInfo, userDetails, comments} = card;
@@ -67,7 +67,7 @@ const createPopupTemplate = (card, commentsArr) => {
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Release Date</td>
-                  <td class="film-details__cell">${humanizeTaskDueDate(filmInfo.release.date)}</td>
+                  <td class="film-details__cell">${humanizeTaskDueDate(filmInfo.release.date, 'YYYY')}</td>
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Runtime</td>
@@ -127,10 +127,10 @@ const createPopupTemplate = (card, commentsArr) => {
   );
 };
 
-export default class PopupView {
-  #element = null;
+export default class PopupView extends AbstractView{
 
   constructor(movieCard, movieComments) {
+    super();
     this.card = movieCard;
     this.comments = movieComments;
   }
@@ -139,15 +139,12 @@ export default class PopupView {
     return createPopupTemplate(this.card, this.comments);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
+  setClickHandler = (callback) => {
+    this._callback.popupCloseButtonClick = callback;
+    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#clickHandler, {once: true});
+  };
 
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
-  }
+  #clickHandler = () => {
+    this._callback.popupCloseButtonClick();
+  };
 }
