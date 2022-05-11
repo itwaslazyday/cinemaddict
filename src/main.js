@@ -1,5 +1,5 @@
 import UserRatingView from './view/user-rating-view.js';
-import {render} from './render.js';
+import {render} from './framework/render.js';
 import MoviesModel from './model/movies-data-model.js';
 import MoviesPresenter from './presenter/movies-presenter.js';
 

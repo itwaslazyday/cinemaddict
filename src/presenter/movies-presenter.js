@@ -7,8 +7,8 @@ import MoviesWrapperView from '../view/movies-wrapper-view.js';
 import MovieCardView from '../view/movie-card-view.js';
 import PopupView from '../view/popup-view.js';
 import LoadMoreButtonView from '../view/load-more-button-view.js';
-import {render, RenderPosition} from '../render.js';
-import {isEscapeKey} from '../utils.js';
+import {render, RenderPosition, remove} from '../framework/render.js';
+import {isEscapeKey} from '../utils/common.js';
 
 const pageBody = document.querySelector('body');
 const siteFooterElement = pageBody.querySelector('footer');
@@ -53,7 +53,7 @@ export default class MoviesPresenter {
         this.#renderMovie(this.#moviesCards[i], this.#moviesWrapper.element);
       }
 
-      this.#moviesBlock.element.addEventListener('click',
+      this.#moviesBlock.setClickHandler(
         (evt) => {
           if (evt.target.classList.contains('film-card__poster')) {
             if (document.querySelector('.film-details')) {
@@ -68,12 +68,11 @@ export default class MoviesPresenter {
 
     if (this.#moviesCards.length > MOVIES_COUNT_PER_STEP) {
       render(this.#loadMoreButtonComponent, this.#moviesList.element);
-      this.#loadMoreButtonComponent.element.addEventListener('click', this.#onLoadMoreButtonClick);
+      this.#loadMoreButtonComponent.setClickHandler(this.#onLoadMoreButtonClick);
     }
   };
 
-  #onLoadMoreButtonClick = (evt) => {
-    evt.preventDefault();
+  #onLoadMoreButtonClick = () => {
     this.#moviesCards
       .slice(this.#renderedMoviesCount, this.#renderedMoviesCount + MOVIES_COUNT_PER_STEP)
       .forEach((movie) => this.#renderMovie(movie, this.#moviesWrapper.element));
@@ -81,8 +80,7 @@ export default class MoviesPresenter {
     this.#renderedMoviesCount += MOVIES_COUNT_PER_STEP;
 
     if (this.#renderedMoviesCount >= this.#moviesCards.length) {
-      this.#loadMoreButtonComponent.element.remove();
-      this.#loadMoreButtonComponent.removeElement();
+      remove(this.#loadMoreButtonComponent);
     }
   };
 
@@ -92,17 +90,11 @@ export default class MoviesPresenter {
   };
 
   #renderPopup = (id) => {
-
-    const setPopupWindow = (element) => {
-      pageBody.classList.toggle('hide-overflow');
-      const popupCloseButton = element.querySelector('.film-details__close-btn');
-      popupCloseButton.addEventListener('click', this.#onPopupCloseClick, {once: true});
-      document.addEventListener('keydown', this.#onPopupEscPress);
-    };
-
     this.#moviePopup = new PopupView(this.#moviesCards[id], this.#moviesComments);
     render(this.#moviePopup, siteFooterElement, RenderPosition.AFTEREND);
-    setPopupWindow(this.#moviePopup.element);
+    pageBody.classList.toggle('hide-overflow');
+    this.#moviePopup.setClickHandler(this.#onPopupCloseClick);
+    document.addEventListener('keydown', this.#onPopupEscPress);
   };
 
   #onPopupCloseClick = () => {
