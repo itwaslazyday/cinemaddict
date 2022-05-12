@@ -40,7 +40,7 @@ export default class MoviesPresenter {
   };
 
   #renderBoard = () => {
-    render(new AppNavigationView(), this.#moviesContainer);
+    render(new AppNavigationView(this.#moviesCards), this.#moviesContainer);
     render(new AppSortingView(), this.#moviesContainer);
     render(this.#moviesBlock, this.#moviesContainer);
     render(this.#moviesList, this.#moviesBlock.element);
