@@ -67,7 +67,7 @@ const createPopupTemplate = (card, commentsArr) => {
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Release Date</td>
-                  <td class="film-details__cell">${humanizeTaskDueDate(filmInfo.release.date, 'YYYY')}</td>
+                  <td class="film-details__cell">${humanizeTaskDueDate(filmInfo.release.date, 'DD MMMM YYYY')}</td>
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Runtime</td>
@@ -146,5 +146,32 @@ export default class PopupView extends AbstractView{
 
   #clickHandler = () => {
     this._callback.popupCloseButtonClick();
+  };
+
+  setWatchlistClickHandler = (callback) => {
+    this._callback.toWatchListClick = callback;
+    this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click', this.#watchListClickHandler);
+  };
+
+  #watchListClickHandler = () => {
+    this._callback.toWatchListClick();
+  };
+
+  setAlreadyWatchedClickHandler = (callback) => {
+    this._callback.alreadyWatchedClick = callback;
+    this.element.querySelector('.film-details__control-button--watched').addEventListener('click', this.#alreadyWatchedClickHandler);
+  };
+
+  #alreadyWatchedClickHandler = () => {
+    this._callback.alreadyWatchedClick();
+  };
+
+  setFavoriteClickHandler = (callback) => {
+    this._callback.favoriteClick = callback;
+    this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#favoriteClickHandler);
+  };
+
+  #favoriteClickHandler = () => {
+    this._callback.favoriteClick();
   };
 }

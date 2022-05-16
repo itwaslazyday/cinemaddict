@@ -1,13 +1,13 @@
 import UserRatingView from './view/user-rating-view.js';
 import {render} from './framework/render.js';
 import MoviesModel from './model/movies-data-model.js';
-import MoviesPresenter from './presenter/movies-presenter.js';
+import BoardPresenter from './presenter/board-presenter.js';
 
 const siteHeaderElement = document.querySelector('header');
 const siteMainElement = document.querySelector('.main');
 const moviesModel = new MoviesModel();
-const moviesPresenter = new MoviesPresenter(siteMainElement, moviesModel);
+const boardPresenter = new BoardPresenter(siteMainElement, moviesModel);
 
 render(new UserRatingView(), siteHeaderElement);
 
-moviesPresenter.init();
+boardPresenter.init();

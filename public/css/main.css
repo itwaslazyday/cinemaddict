@@ -227,6 +227,10 @@ button {
   padding-top: calc(340px + 10px);
 }
 
+.film-card__link {
+  display: block;
+}
+
 .film-card__link:hover {
   opacity: 1;
 }
