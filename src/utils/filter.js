@@ -1,4 +1,4 @@
-import {FilterType} from '../const';
+import {FilterType} from '../const.js';
 
 const filter = {
   [FilterType.WATCHLIST]: (movies) => movies.filter(({userDetails}) => userDetails.watchlist === true),
