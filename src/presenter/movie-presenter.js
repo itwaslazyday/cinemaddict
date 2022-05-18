@@ -72,9 +72,9 @@ export default class MoviePresenter {
     render(this.#moviePopup, siteFooterElement, RenderPosition.AFTEREND);
     pageBody.classList.toggle('hide-overflow');
     this.#moviePopup.setClickHandler(this.#onPopupCloseClick);
-    this.#moviePopup.setFavoriteClickHandler(this.#onFavoriteClick);
     this.#moviePopup.setWatchlistClickHandler(this.#onWatchListClick);
     this.#moviePopup.setAlreadyWatchedClickHandler(this.#onAlreadyWatchedClick);
+    this.#moviePopup.setFavoriteClickHandler(this.#onFavoriteClick);
     document.addEventListener('keydown', this.#onPopupEscPress);
   };
 
