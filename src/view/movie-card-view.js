@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import {humanizeTaskDueDate, humanizeMovieRuntime} from '../utils/movieDate.js';
+import {humanizeTaskDueDate, humanizeMovieRuntime} from '../utils/movie-date.js';
 
 
 const createMovieCardTemplate = (card) => {
