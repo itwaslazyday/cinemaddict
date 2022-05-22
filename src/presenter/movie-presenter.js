@@ -36,7 +36,10 @@ export default class MoviePresenter {
 
     if (this.#moviesContainer.contains(prevMovieCard.element)) {
       replace(this.#movieCard, prevMovieCard);
-      if (document.querySelector('.film-details')) {this.#onMovieCardClick();}
+      if (document.querySelector('.film-details')) {
+        this.scrollPosition = document.querySelector('.film-details').scrollTop;
+        this.#onMovieCardClick();
+      }
     }
 
     remove(prevMovieCard);
@@ -51,8 +54,7 @@ export default class MoviePresenter {
     if (document.querySelector('.film-details')) {
       this.#onPopupCloseClick();
     }
-    const movieId = this.#movieCard.card.id;
-    this.#renderPopup(movieId);
+    this.#renderPopup();
   };
 
   #onWatchListClick = () => {
@@ -69,13 +71,14 @@ export default class MoviePresenter {
 
   #renderPopup = () => {
     this.#moviePopup = new PopupView(this.#movieCard.card, this.#moviesComments);
-    render(this.#moviePopup, siteFooterElement, RenderPosition.AFTEREND);
-    pageBody.classList.toggle('hide-overflow');
-    this.#moviePopup.setClickHandler(this.#onPopupCloseClick);
+    this.#moviePopup.setCloseClickHandler(this.#onPopupCloseClick);
     this.#moviePopup.setWatchlistClickHandler(this.#onWatchListClick);
     this.#moviePopup.setAlreadyWatchedClickHandler(this.#onAlreadyWatchedClick);
     this.#moviePopup.setFavoriteClickHandler(this.#onFavoriteClick);
     document.addEventListener('keydown', this.#onPopupEscPress);
+    pageBody.classList.toggle('hide-overflow');
+    render(this.#moviePopup, siteFooterElement, RenderPosition.AFTEREND);
+    document.querySelector('.film-details').scrollTop = this.scrollPosition;
   };
 
   #onPopupCloseClick = () => {

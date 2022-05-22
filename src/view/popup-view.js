@@ -1,15 +1,16 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {humanizeTaskDueDate, humanizeMovieRuntime} from '../utils/movie-date.js';
 
 const createPopupTemplate = (card, commentsArr) => {
-  const {filmInfo, userDetails, comments} = card;
+  const {filmInfo, userDetails, comments, tappedEmotionId, description} = card;
+  const createEmotion = () =>  (tappedEmotionId) ? `<img src="./images/emoji/${tappedEmotionId.split('-')[1]}.png" width="55" height="55" alt="emoji"></img>` : '';
+  const createDescription = () => (description) ? `${description}` : '';
   const getControlClassName = (option) => option
     ? 'film-details__control-button--active'
     : '';
   const selectedComments = commentsArr.filter(({id}) => comments.some((item) => item === id));
   const createCommentsTemplate = () => {
     const commentsList = document.createElement('ul');
-    commentsList.classList.add('film-details__comments-list');
     selectedComments.forEach((item) => {
       commentsList.insertAdjacentHTML('beforeend',
         `<li class="film-details__comment">
@@ -97,9 +98,9 @@ const createPopupTemplate = (card, commentsArr) => {
             <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
             <ul class="film-details__comments-list">${createCommentsTemplate().innerHTML}</ul>
             <div class="film-details__new-comment">
-              <div class="film-details__add-emoji-label"></div>
+              <div class="film-details__add-emoji-label">${createEmotion()}</div>
               <label class="film-details__comment-label">
-                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${createDescription()}</textarea>
               </label>
               <div class="film-details__emoji-list">
                 <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile">
@@ -127,24 +128,28 @@ const createPopupTemplate = (card, commentsArr) => {
   );
 };
 
-export default class PopupView extends AbstractView{
+export default class PopupView extends AbstractStatefulView {
 
   constructor(movieCard, movieComments) {
     super();
-    this.card = movieCard;
+    this.movieCard = movieCard;
+    this._state = PopupView.parseMovieToState(movieCard);
     this.comments = movieComments;
+    this.#setInnerHandlers();
   }
 
   get template() {
-    return createPopupTemplate(this.card, this.comments);
+    return createPopupTemplate(this._state, this.comments);
   }
 
-  setClickHandler = (callback) => {
+  static parseMovieToState = (movieCard) => ({...movieCard, tappedEmotionId: null});
+
+  setCloseClickHandler = (callback) => {
     this._callback.popupCloseButtonClick = callback;
-    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#clickHandler, {once: true});
+    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#closeClickHandler, {once: true});
   };
 
-  #clickHandler = () => {
+  #closeClickHandler = () => {
     this._callback.popupCloseButtonClick();
   };
 
@@ -173,5 +178,36 @@ export default class PopupView extends AbstractView{
 
   #favoriteClickHandler = () => {
     this._callback.favoriteClick();
+  };
+
+  _restoreHandlers = () => {
+    this.#setInnerHandlers();
+    this.setWatchlistClickHandler(this._callback.toWatchListClick);
+    this.setAlreadyWatchedClickHandler(this._callback.alreadyWatchedClick);
+    this.setFavoriteClickHandler(this._callback.favoriteClick);
+    this.setCloseClickHandler(this._callback.popupCloseButtonClick);
+  };
+
+  #setInnerHandlers = () => {
+    this.element.querySelector('.film-details__emoji-list').addEventListener('click', this.#emotionClickHandler);
+    this.element.querySelector('.film-details__comment-input').addEventListener('input', this.#descriptionInputHandler);
+  };
+
+  #descriptionInputHandler = (evt) => {
+    evt.preventDefault();
+    this._setState({
+      description: evt.target.value,
+    });
+  };
+
+  #emotionClickHandler = (evt) => {
+    if (evt.target.nodeName === 'INPUT') {
+      evt.preventDefault();
+      const scrollPosition = this.element.scrollTop;
+      this.updateElement({
+        tappedEmotionId: evt.target.id,
+      });
+      this.element.scrollTop = scrollPosition;
+    }
   };
 }
