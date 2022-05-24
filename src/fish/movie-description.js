@@ -21,11 +21,11 @@ export const generateMovieDescription = () => ([
         date: '1965-05-11T00:00:00.000Z',
         releaseCountry: 'Finland'
       },
-      runtime: 108,
+      runtime: 55,
       genre: [
         'Comedy'
       ],
-      description: 'Oscar-winning film, a war drama about two young people, from the creators of timeless classic \'Nu, Pogodi!\' and \'Alice in Wonderland\', with the best fight scenes since Bruce Lee.'
+      description: 'Oscar-winning film, a war drama about two young people, from the creators of timeless classic \'Nu, Pogodi!\'.'
     },
     userDetails: {
       watchlist: true,
@@ -58,11 +58,11 @@ export const generateMovieDescription = () => ([
         date: '1974-05-11T00:00:00.000Z',
         releaseCountry: 'Finland'
       },
-      runtime: 108,
+      runtime: 90,
       genre: [
         'Comedy'
       ],
-      description: 'Oscar-winning film, a war drama about two young people, from the creators of timeless classic \'Nu, Pogodi!\' and \'Alice in Wonderland\', with the best fight scenes since Bruce Lee.'
+      description: '\'Alice in Wonderland\', with the best fight scenes since Bruce Lee.'
     },
     userDetails: {
       watchlist: false,
@@ -98,11 +98,12 @@ export const generateMovieDescription = () => ([
         date: '1957-05-11T00:00:00.000Z',
         releaseCountry: 'Russia'
       },
-      runtime: 108,
+      runtime: 78,
       genre: [
-        'Comedy'
+        'Comedy',
+        'Drama'
       ],
-      description: 'Oscar-winning film, a war drama about two young people, from the creators of timeless classic \'Nu, Pogodi!\' and \'Alice in Wonderland\', with the best fight scenes since Bruce Lee.'
+      description: 'Oscar-winning film, a war drama about two young people classic \'Nu, Pogodi!\' and \'Alice in Wonderland\', with the best fight scenes since Bruce Lee, from the creators of timeless classic \'Nu, Pogodi!\' and \'Alice in Wonderland\', with the best fight scenes since Bruce Lee.'
     },
     userDetails: {
       watchlist: false,
@@ -136,9 +137,10 @@ export const generateMovieDescription = () => ([
         date: '1934-05-11T00:00:00.000Z',
         releaseCountry: 'Finland'
       },
-      runtime: 108,
+      runtime: 120,
       genre: [
-        'Comedy'
+        'Horror',
+        'Action'
       ],
       description: 'Oscar-winning film, a war drama about two young people, from the creators of timeless classic \'Nu, Pogodi!\' and \'Alice in Wonderland\', with the best fight scenes since Bruce Lee.'
     },
@@ -173,7 +175,7 @@ export const generateMovieDescription = () => ([
         date: '1981-05-11T00:00:00.000Z',
         releaseCountry: 'Finland'
       },
-      runtime: 108,
+      runtime: 40,
       genre: [
         'Comedy'
       ],
@@ -212,7 +214,7 @@ export const generateMovieDescription = () => ([
         date: '1946-04-11T00:00:00.000Z',
         releaseCountry: 'Finland'
       },
-      runtime: 108,
+      runtime: 135,
       genre: [
         'Comedy'
       ],
@@ -249,7 +251,7 @@ export const generateMovieDescription = () => ([
         date: '1973-05-11T00:00:00.000Z',
         releaseCountry: 'Finland'
       },
-      runtime: 108,
+      runtime: 999,
       genre: [
         'Comedy'
       ],
@@ -285,7 +287,7 @@ export const generateMovieDescription = () => ([
         date: '1966-05-11T00:00:00.000Z',
         releaseCountry: 'Finland'
       },
-      runtime: 108,
+      runtime: 59,
       genre: [
         'Comedy'
       ],
