@@ -1,25 +1,14 @@
 import dayjs from 'dayjs';
-/**
- *
- * @param {*} date Дата и время в машинописном формате
- * @param {*} format Необходимый формат вывода даты 'YYYY, MM, DD'
- * @returns Возвращает дату/время в заданных форматах
- */
+import duration from 'dayjs/plugin/duration';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(duration);
+dayjs.extend(relativeTime);
 
 const humanizeTaskDueDate = (date, format) => dayjs(date).format(format);
-/**
- *
- * @param {*} runTime Длительность фильма в минутах
- * @returns Длительность фильма в формате 'ЧЧ ММ'
- */
-const humanizeMovieRuntime = (runTime) => {
-  const runTimeInHours = Math.trunc(runTime / 60);
-  const runTimeInMinutes = runTime - runTimeInHours * 60;
-  return runTime >= 60 ? `${runTimeInHours}h ${runTimeInMinutes}m` : `${runTimeInMinutes}m`;
-};
 
-// Функция помещает задачи без даты в конце списка,
-// возвращая нужный вес для колбэка sort
+const humanizeMovieRuntime = (runTime, format) => dayjs.duration(runTime, 'minutes').format(format);
+
 const getWeightForNullDate = (dateA, dateB) => {
   if (dateA === null && dateB === null) {
     return 0;
