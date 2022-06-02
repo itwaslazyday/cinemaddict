@@ -51,8 +51,8 @@ export default class MovieCardView extends AbstractView {
     this.element.querySelector('.film-card__link').addEventListener('click', this.#clickHandler);
   };
 
-  #clickHandler = (evt) => {
-    this._callback.movieCardClick(evt);
+  #clickHandler = () => {
+    this._callback.movieCardClick();
   };
 
   setWatchlistClickHandler = (callback) => {

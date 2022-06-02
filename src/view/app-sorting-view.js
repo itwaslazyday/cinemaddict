@@ -24,6 +24,8 @@ export default class AppSortingView extends AbstractView {
     }
 
     evt.preventDefault();
+    document.querySelectorAll('.sort__button').forEach((item) => (item.className = 'sort__button'));
+    evt.target.classList.toggle('sort__button--active');
     this._callback.sortTypeChange(evt.target.dataset.sortType);
   };
 }

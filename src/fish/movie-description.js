@@ -2,7 +2,8 @@ export const generateMovieDescription = () => ([
   {
     id: '5',
     comments: [
-      '815'
+      '1',
+      '2'
     ],
     filmInfo: {
       title: 'Great Crime',
@@ -37,9 +38,8 @@ export const generateMovieDescription = () => ([
   {
     id: '6',
     comments: [
-      '1111',
       '3',
-      '45'
+      '4'
     ],
     filmInfo: {
       title: 'The little women',
@@ -74,12 +74,12 @@ export const generateMovieDescription = () => ([
   {
     id: '7',
     comments: [
-      '18',
-      '199',
-      '822',
-      '189',
-      '3',
-      '11'
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+      '10'
     ],
     filmInfo: {
       title: 'Smoking baby',
@@ -115,10 +115,10 @@ export const generateMovieDescription = () => ([
   {
     id: '8',
     comments: [
-      '822',
-      '189',
-      '3',
-      '11'
+      '11',
+      '12',
+      '13',
+      '14'
     ],
     filmInfo: {
       title: 'A Little Pony Without The Carpet',
@@ -154,9 +154,9 @@ export const generateMovieDescription = () => ([
   {
     id: '9',
     comments: [
-      '1111',
-      '45',
-      '189'
+      '15',
+      '16',
+      '17'
     ],
     filmInfo: {
       title: 'The man who sold the wife',
@@ -191,11 +191,9 @@ export const generateMovieDescription = () => ([
   {
     id: '0',
     comments: [
-      '815',
-      '816',
-      '817',
-      '3',
-      '45'
+      '18',
+      '19',
+      '20'
     ],
     filmInfo: {
       title: 'The Carpet',
@@ -230,9 +228,9 @@ export const generateMovieDescription = () => ([
   {
     id: '1',
     comments: [
-      '1111',
-      '3',
-      '45'
+      '21',
+      '22',
+      '23'
     ],
     filmInfo: {
       title: 'Hello, Katy!',
@@ -267,8 +265,8 @@ export const generateMovieDescription = () => ([
   {
     id: '2',
     comments: [
-      '18',
-      '199'
+      '24',
+      '25'
     ],
     filmInfo: {
       title: 'The kick of Chucky',
@@ -303,10 +301,10 @@ export const generateMovieDescription = () => ([
   {
     id: '3',
     comments: [
-      '822',
-      '189',
-      '3',
-      '11'
+      '26',
+      '30',
+      '31',
+      '32'
     ],
     filmInfo: {
       title: 'Dogs & cats',
@@ -341,9 +339,9 @@ export const generateMovieDescription = () => ([
   {
     id: '4',
     comments: [
-      '1111',
-      '45',
-      '189'
+      '27',
+      '28',
+      '29'
     ],
     filmInfo: {
       title: 'The Moon above',

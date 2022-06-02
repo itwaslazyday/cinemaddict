@@ -1,5 +1,6 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {humanizeTaskDueDate, humanizeMovieRuntime} from '../utils/movie-date.js';
+import {getRandomInteger} from '../utils/common.js';
 
 const createPopupTemplate = (state, commentsArr) => {
   const {
@@ -27,7 +28,7 @@ const createPopupTemplate = (state, commentsArr) => {
             <p class="film-details__comment-info">
               <span class="film-details__comment-author">${item.author}</span>
               <span class="film-details__comment-day">${humanizeTaskDueDate(item.date, 'YYYY/MM/DD HH:mm')}</span>
-              <button class="film-details__comment-delete">Delete</button>
+              <button class="film-details__comment-delete" data-comment-id=${item.id}>Delete</button>
             </p>
           </div>
         </li>`
@@ -37,7 +38,7 @@ const createPopupTemplate = (state, commentsArr) => {
   };
 
   return (
-    `<section class="film-details">
+    `<section class="film-details" data-film-id=${state.id}>
       <form class="film-details__inner" action="" method="get">
         <div class="film-details__top-container">
           <div class="film-details__close">
@@ -132,6 +133,14 @@ const createPopupTemplate = (state, commentsArr) => {
   );
 };
 
+const createNewCommentTemplate = (evt) => ({
+  'id': `${getRandomInteger(34, 100)}`,
+  'author': 'Alex Fish',
+  'comment': evt.target.value,
+  'date': new Date(),
+  'emotion': 'smile'
+});
+
 export default class PopupView extends AbstractStatefulView {
 
   constructor(movieCard, movieComments) {
@@ -184,12 +193,40 @@ export default class PopupView extends AbstractStatefulView {
     this._callback.favoriteClick();
   };
 
+
+  setCommentDeleteClickHandler = (callback) => {
+    this._callback.commentDeleteClick = callback;
+    this.element.querySelector('.film-details__comments-list').addEventListener('click', this.#commentDeleteClickHandler);
+  };
+
+  #commentDeleteClickHandler = (evt) => {
+    if (evt.target.nodeName === 'BUTTON') {
+      evt.preventDefault();
+      this._callback.commentDeleteClick(evt.target.dataset.commentId);
+    }
+  };
+
+  setformSubmitHandler = (callback) => {
+    this._callback.commentFormSubmit = callback;
+    this.element.querySelector('.film-details__comment-input').addEventListener('keydown', this.#formSubmitHandler);
+  };
+
+  #formSubmitHandler = (evt) => {
+    if ((evt.keyCode === 10 || evt.keyCode === 13) && (evt.ctrlKey || evt.metaKey)) {
+      evt.preventDefault();
+      this._callback.commentFormSubmit(createNewCommentTemplate(evt));
+      evt.target.value = '';
+    }
+  };
+
   _restoreHandlers = () => {
     this.#setInnerHandlers();
     this.setWatchlistClickHandler(this._callback.toWatchListClick);
     this.setAlreadyWatchedClickHandler(this._callback.alreadyWatchedClick);
     this.setFavoriteClickHandler(this._callback.favoriteClick);
     this.setCloseClickHandler(this._callback.popupCloseButtonClick);
+    this.setCommentDeleteClickHandler(this._callback.commentDeleteClick);
+    this.setformSubmitHandler(this._callback.commentFormSubmit);
   };
 
   #setInnerHandlers = () => {
