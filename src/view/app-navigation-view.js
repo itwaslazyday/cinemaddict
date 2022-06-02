@@ -1,23 +1,44 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import {generateFilter} from '../fish/movie-filter.js';
 
-const getFilterCount = (movies, name) => generateFilter(movies).find((filter) => filter.name === name).count;
+const createFilterItemTemplate = (filter, currentFilterType) => {
+  const {type, name, count} = filter;
+  return (
+    `<a href="#${type}" class="main-navigation__item ${type === currentFilterType ? 'main-navigation__item--active' : ''}">
+      ${type === 'all' ? `${name} movies` : name} ${count > 0 && type !== 'all' ? `<span class="main-navigation__item-count">${count}</span>` : ''}</a>`
+  );
+};
 
-const createAppNavigationTemplate = (movies) => `<nav class="main-navigation">
-<a href="#all" class="main-navigation__item main-navigation__item--active">All movies</a>
-<a href="#watchlist" class="main-navigation__item">Watchlist <span class="main-navigation__item-count">${getFilterCount(movies, 'watchlist')}</span></a>
-<a href="#history" class="main-navigation__item">History <span class="main-navigation__item-count">${getFilterCount(movies, 'history')}</span></a>
-<a href="#favorites" class="main-navigation__item">Favorites <span class="main-navigation__item-count">${getFilterCount(movies, 'favorites')}</span></a>
-</nav>`;
+const createFilterTemplate = (filterItems, currentFilterType) => {
+  const filterItemsTemplate = filterItems
+    .map((filter) => createFilterItemTemplate(filter, currentFilterType))
+    .join('');
+
+  return `<nav class="main-navigation">${filterItemsTemplate}</nav>`;
+};
 
 export default class AppNavigationView extends AbstractView {
 
-  constructor(moviesCards) {
+  #filters = null;
+  #currentFilter = null;
+
+  constructor(filters, currentFilterType) {
     super();
-    this.movies = moviesCards;
+    this.#filters = filters;
+    this.#currentFilter = currentFilterType;
   }
 
   get template() {
-    return createAppNavigationTemplate(this.movies);
+    return createFilterTemplate(this.#filters, this.#currentFilter);
   }
+
+  setFilterTypeChangeHandler = (callback) => {
+    this._callback.filterTypeChange = callback;
+    this.element.addEventListener('click', this.#filterTypeChangeHandler);
+  };
+
+  #filterTypeChangeHandler = (evt) => {
+    evt.preventDefault();
+    if (evt.target.nodeName === 'A') {this._callback.filterTypeChange(evt.target.href.split('#')[1]);}
+  };
+
 }
