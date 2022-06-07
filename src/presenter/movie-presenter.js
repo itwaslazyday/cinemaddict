@@ -5,7 +5,6 @@ import {isEscapeKey} from '../utils/common.js';
 import {UpdateType} from '../const.js';
 
 const pageBody = document.querySelector('body');
-const siteFooterElement = pageBody.querySelector('footer');
 
 export default class MoviePresenter {
   #moviePopup = null;
@@ -42,15 +41,12 @@ export default class MoviePresenter {
       }
     }
 
-    if (document.querySelector('.film-details')) {
-      this.#popupCard = this.#moviesModel.movies.find((item) => item.id === document.querySelector('.film-details').dataset.filmId);
-    } else {
-      this.#popupCard = this.#moviesModel.movies.find((item) => item.id === movie.id);
-    }
+    this.#popupCard = movie;
 
-    if (document.querySelector('.film-details') && this.#moviesModel.founded) {
+    if (document.querySelector('.film-details') && this.#moviesModel.popupRerender) {
+      this.#popupCard = this.#moviesModel.movies.find((item) => item.id === this.#moviesModel.popupId);
       this.#onMovieCardClick(this.#popupCard);
-      this.#moviesModel.founded = false;
+      this.#moviesModel.popupRerender = false;
     }
   };
 
@@ -67,32 +63,34 @@ export default class MoviePresenter {
   };
 
   #onWatchListClick = () => {
-    this.#moviesModel.founded = true;
-    this.#changeData(this.#filterModel.filter === 'all' ? UpdateType.PATCH : UpdateType.MAJOR, {...this.#popupCard, userDetails: {...this.#popupCard.userDetails, watchlist: !this.#popupCard.userDetails.watchlist}});
+    this.#changeData(this.#filterModel.filter === 'all' ? UpdateType.PATCH : UpdateType.MAJOR,
+      {...this.#popupCard, userDetails: {...this.#popupCard.userDetails, watchlist: !this.#popupCard.userDetails.watchlist}});
   };
 
   #onAlreadyWatchedClick = () => {
-    this.#moviesModel.founded = true;
-    this.#changeData(this.#filterModel.filter === 'all' ? UpdateType.PATCH : UpdateType.MAJOR, {...this.#popupCard, userDetails: {...this.#popupCard.userDetails, alreadyWatched: !this.#popupCard.userDetails.alreadyWatched}});
+    this.#changeData(this.#filterModel.filter === 'all' ? UpdateType.PATCH : UpdateType.MAJOR,
+      {...this.#popupCard, userDetails: {...this.#popupCard.userDetails, alreadyWatched: !this.#popupCard.userDetails.alreadyWatched}});
   };
 
   #onFavoriteClick = () => {
-    this.#moviesModel.founded = true;
-    this.#changeData(this.#filterModel.filter === 'all' ? UpdateType.PATCH : UpdateType.MAJOR, {...this.#popupCard, userDetails: {...this.#popupCard.userDetails, favorite: !this.#popupCard.userDetails.favorite}});
+    this.#changeData(this.#filterModel.filter === 'all' ? UpdateType.PATCH : UpdateType.MAJOR,
+      {...this.#popupCard, userDetails: {...this.#popupCard.userDetails, favorite: !this.#popupCard.userDetails.favorite}});
   };
 
   #onCommentDeleteClick = (deletedCommentId) => {
-    this.#moviesModel.founded = true;
-    this.#changeData(UpdateType.MAJOR, {...this.#popupCard, comments: [...this.#popupCard.comments.filter((item) => item !== deletedCommentId)], deletedCommentId: deletedCommentId, newComment: ''});
+    this.#changeData(UpdateType.MAJOR,
+      {...this.#popupCard, comments: [...this.#popupCard.comments.filter((item) => item !== deletedCommentId)], deletedCommentId: deletedCommentId});
   };
 
   #onCommentFormSubmit = (newComment) => {
-    this.#moviesModel.founded = true;
-    this.#changeData(UpdateType.MAJOR, {...this.#popupCard, comments: [...this.#popupCard.comments, newComment.id], newComment: newComment, deletedCommentId: ''});
+    this.#changeData(UpdateType.MAJOR,
+      {...this.#popupCard, comments: [...this.#popupCard.comments, newComment.id], newComment: newComment});
   };
 
-  #renderPopup = (card = this.#movieCard.card) => {
+  #renderPopup = async (card = this.#movieCard.card) => {
+    await this.#commentsModel.init(card);
     this.#moviePopup = new PopupView(card, this.#commentsModel.comments);
+    this.#moviesModel.popupId = this.#moviePopup.element.dataset.filmId;
     this.#moviePopup.setCloseClickHandler(this.#onPopupCloseClick);
     this.#moviePopup.setWatchlistClickHandler(this.#onWatchListClick);
     this.#moviePopup.setAlreadyWatchedClickHandler(this.#onAlreadyWatchedClick);
@@ -101,8 +99,8 @@ export default class MoviePresenter {
     this.#moviePopup.setformSubmitHandler(this.#onCommentFormSubmit);
     document.addEventListener('keydown', this.#onPopupEscPress);
     pageBody.classList.toggle('hide-overflow');
-    render(this.#moviePopup, siteFooterElement, RenderPosition.AFTEREND);
-    document.querySelector('.film-details').scrollTop = this.scrollPosition;
+    render(this.#moviePopup, pageBody.querySelector('footer'), RenderPosition.AFTEREND);
+    this.#moviePopup.element.scrollTop = this.#moviesModel.popupScrollPosition;
   };
 
   #onPopupCloseClick = () => {
