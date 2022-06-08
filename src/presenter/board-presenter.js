@@ -6,6 +6,8 @@ import CommentedMoviesListView from '../view/movies-commented-list-view.js';
 import EmptyListView from '../view/empty-movies-list-view.js';
 import MoviesWrapperView from '../view/movies-wrapper-view.js';
 import LoadMoreButtonView from '../view/load-more-button-view.js';
+import LoadingView from '../view/loading-view.js';
+import SiteFooterView from '../view/site-footer-view.js';
 import {render, remove, RenderPosition} from '../framework/render.js';
 import MoviePresenter from './movie-presenter.js';
 import {sortByDate, sortByRating} from '../utils/movie-date.js';
@@ -27,6 +29,7 @@ export default class BoardPresenter {
   #ratedMoviesWrapperComponent = new MoviesWrapperView();
   #commentedMoviesWrapperComponent = new MoviesWrapperView();
   #loadMoreButtonComponent = new LoadMoreButtonView();
+  #loadingComponent = new LoadingView();
   #moviePresenter = new Map();
   #ratedMoviesPresenter = new Map();
   #commentedMoviesPresenter = new Map();
@@ -37,6 +40,7 @@ export default class BoardPresenter {
   #filterModel = null;
   #commentsModel = null;
   #currentSortType = SortType.DEFAULT;
+  #isLoading = true;
 
   constructor(moviesContainer, moviesModel, filterModel, commentsModel) {
     this.#moviesContainer = moviesContainer;
@@ -67,7 +71,13 @@ export default class BoardPresenter {
   };
 
   #renderBoard = () => {
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
+
     this.#renderSort(this.#sortComponent, this.#moviesContainer);
+    this.#renderSiteFooter(new SiteFooterView(this.movies.length), this.#moviesContainer, RenderPosition.AFTEREND);
     this.#renderMoviesPlace();
 
     if (this.movies.length === 0) {
@@ -80,9 +90,18 @@ export default class BoardPresenter {
     }
   };
 
+  #renderLoading = () => {
+    render(this.#loadingComponent, this.#moviesContainer);
+  };
+
+
   #renderSort = (component, container, position) => {
     render(component, container, position);
     this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
+  };
+
+  #renderSiteFooter = (component, container, position) => {
+    render(component, container, position);
   };
 
   #handleSortTypeChange = (sortType) => {
@@ -198,6 +217,10 @@ export default class BoardPresenter {
   };
 
   #handleViewAction = (updateType, update) => {
+    this.#moviesModel.popupRerender = true;
+    if (document.querySelector('.film-details')) {
+      this.#moviesModel.popupScrollPosition = document.querySelector('.film-details').scrollTop;
+    }
     if (update.deletedCommentId) {this.#commentsModel.deleteComment(updateType, update);}
     if (update.newComment) {this.#commentsModel.addComment(updateType, update);}
     this.#moviesModel.updateMovie(updateType, update);
@@ -224,6 +247,11 @@ export default class BoardPresenter {
         this.#clearMoviesList({resetRenderedMoviesCount: false, renderDownSideMovies: true, resetSortType: true});
         this.#renderUpSideMovies();
         this.#renderDownSideMovies();
+        break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#renderBoard();
         break;
     }
   };

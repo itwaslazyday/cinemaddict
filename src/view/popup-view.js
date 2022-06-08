@@ -1,6 +1,7 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {humanizeTaskDueDate, humanizeMovieRuntime} from '../utils/movie-date.js';
 import {getRandomInteger} from '../utils/common.js';
+import he from 'he';
 
 const createPopupTemplate = (state, commentsArr) => {
   const {
@@ -8,7 +9,7 @@ const createPopupTemplate = (state, commentsArr) => {
     userDetails: {watchlist, alreadyWatched, favorite},
     comments, tappedEmotionId, typedComment} = state;
   const createEmotion = () =>  (tappedEmotionId) ? `<img src="./images/emoji/${tappedEmotionId.split('-')[1]}.png" width="55" height="55" alt="emoji"></img>` : '';
-  const createDescription = () => (typedComment) ? `${typedComment}` : '';
+  const createDescription = () => (typedComment) ? typedComment : '';
   const createGenres = () => genre.reduce((acc, gen) => (acc += `<span class="film-details__genre">${gen}</span>`), '');
   const getChecked = (emotion) => emotion === tappedEmotionId ? 'checked' : '';
   const getControlClassName = (option) => option
@@ -24,7 +25,7 @@ const createPopupTemplate = (state, commentsArr) => {
             <img src="./images/emoji/${item.emotion}.png" width="55" height="55" alt="emoji-smile">
           </span>
           <div>
-            <p class="film-details__comment-text">${item.comment}</p>
+            <p class="film-details__comment-text">${he.encode(item.comment)}</p>
             <p class="film-details__comment-info">
               <span class="film-details__comment-author">${item.author}</span>
               <span class="film-details__comment-day">${humanizeTaskDueDate(item.date, 'YYYY/MM/DD HH:mm')}</span>
@@ -133,12 +134,12 @@ const createPopupTemplate = (state, commentsArr) => {
   );
 };
 
-const createNewCommentTemplate = (evt) => ({
+const createNewCommentTemplate = (evt, state) => ({
   'id': `${getRandomInteger(34, 100)}`,
   'author': 'Alex Fish',
   'comment': evt.target.value,
   'date': new Date(),
-  'emotion': 'smile'
+  'emotion': state.tappedEmotionId.split('-')[1]
 });
 
 export default class PopupView extends AbstractStatefulView {
@@ -193,7 +194,6 @@ export default class PopupView extends AbstractStatefulView {
     this._callback.favoriteClick();
   };
 
-
   setCommentDeleteClickHandler = (callback) => {
     this._callback.commentDeleteClick = callback;
     this.element.querySelector('.film-details__comments-list').addEventListener('click', this.#commentDeleteClickHandler);
@@ -214,8 +214,7 @@ export default class PopupView extends AbstractStatefulView {
   #formSubmitHandler = (evt) => {
     if ((evt.keyCode === 10 || evt.keyCode === 13) && (evt.ctrlKey || evt.metaKey)) {
       evt.preventDefault();
-      this._callback.commentFormSubmit(createNewCommentTemplate(evt));
-      evt.target.value = '';
+      this._callback.commentFormSubmit(createNewCommentTemplate(evt, this._state));
     }
   };
 
@@ -237,7 +236,7 @@ export default class PopupView extends AbstractStatefulView {
   #descriptionInputHandler = (evt) => {
     evt.preventDefault();
     this._setState({
-      description: evt.target.value,
+      typedComment: evt.target.value,
     });
   };
 

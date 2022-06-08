@@ -1,9 +1,23 @@
 import Observable from '../framework/observable.js';
-import {generateMovieComments} from '../fish/movie-comments.js';
+import {UpdateType} from '../const.js';
 
 export default class MoviesModel extends Observable {
+  #moviesApiService = null;
+  #comments = [];
 
-  #comments = generateMovieComments();
+  constructor(moviesApiService) {
+    super();
+    this.#moviesApiService = moviesApiService;
+  }
+
+  init = async (movie) => {
+    try {
+      this.#comments = await this.#moviesApiService.getComments(movie);
+    } catch(err) {
+      this.#comments = [];
+    }
+    this._notify(UpdateType.INIT);
+  };
 
   get comments() {
     return this.#comments;
@@ -19,11 +33,13 @@ export default class MoviesModel extends Observable {
       ...this.#comments.slice(0, index),
       ...this.#comments.slice(index + 1),
     ];
+    update.deletedCommentId = '';
     this._notify(updateType, update);
   };
 
   addComment = (updateType, update) => {
     this.#comments = [update.newComment, ...this.#comments];
+    update.newComment = '';
     this._notify(updateType, update);
   };
 }
