@@ -26,6 +26,8 @@ export default class MoviePresenter {
 
   init = (movie) => {
     const prevMovieCard = this.#movieCard;
+    movie.deletingCommentError = false;
+    movie.addingCommentError = false;
     this.#movieCard  = new MovieCardView(movie);
     this.#movieCard.setClickHandler(this.#onMovieCardClick);
     this.#movieCard.setWatchlistClickHandler(this.#onWatchListClick);
@@ -45,6 +47,10 @@ export default class MoviePresenter {
 
     if (document.querySelector('.film-details') && this.#moviesModel.popupRerender) {
       this.#popupCard = this.#moviesModel.movies.find((item) => item.id === this.#moviesModel.popupId);
+      this.#popupCard.deletingCommentError = false;
+      this.#popupCard.addingCommentError = false;
+      if (movie.deletedCommentId) {this.#popupCard.deletingCommentError = true;}
+      if (movie.newComment) {this.#popupCard.addingCommentError = true;}
       this.#onMovieCardClick(this.#popupCard);
       this.#moviesModel.popupRerender = false;
     }
@@ -84,7 +90,7 @@ export default class MoviePresenter {
 
   #onCommentFormSubmit = (newComment) => {
     this.#changeData(UpdateType.MAJOR,
-      {...this.#popupCard, comments: [...this.#popupCard.comments, newComment.id], newComment: newComment});
+      {...this.#popupCard, newComment: newComment});
   };
 
   #renderPopup = async (card = this.#movieCard.card) => {

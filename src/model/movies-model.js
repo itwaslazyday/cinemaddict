@@ -71,7 +71,7 @@ export default class MoviesModel extends Observable {
       ];
       this._notify(updateType, update);
     } catch(err) {
-      throw new Error('Can\'t update task');
+      throw new Error('Can\'t update movie');
     }
   };
 }
