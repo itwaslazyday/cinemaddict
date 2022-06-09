@@ -12,6 +12,7 @@ export default class AbstractStatefulView extends AbstractView {
    * @param {Object} update Объект с обновлённой частью состояния
    */
   updateElement = (update) => {
+    const scrollPosition = this.element.scrollTop;
     if (!update) {
       return;
     }
@@ -19,6 +20,7 @@ export default class AbstractStatefulView extends AbstractView {
     this._setState(update);
 
     this.#rerenderElement();
+    this.element.scrollTop = scrollPosition;
   };
 
   /**

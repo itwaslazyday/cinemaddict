@@ -49,6 +49,7 @@ export default class BoardPresenter {
     this.#commentsModel = commentsModel;
     this.#filterModel = filterModel;
     this.#moviesModel.addObserver(this.#handleMovieEvent);
+    this.#commentsModel.addObserver(this.#handleMovieEvent);
     this.#filterModel.addObserver(this.#handleMovieEvent);
   }
 
@@ -216,13 +217,13 @@ export default class BoardPresenter {
     }
   };
 
-  #handleViewAction = (updateType, update) => {
+  #handleViewAction = async (updateType, update) => {
     this.#moviesModel.popupRerender = true;
     if (document.querySelector('.film-details')) {
       this.#moviesModel.popupScrollPosition = document.querySelector('.film-details').scrollTop;
     }
-    if (update.deletedCommentId) {this.#commentsModel.deleteComment(updateType, update);}
-    if (update.newComment) {this.#commentsModel.addComment(updateType, update);}
+    if (update.deletedCommentId) { await this.#commentsModel.deleteComment(updateType, update);}
+    if (update.newComment) {await this.#commentsModel.addComment(updateType, update);}
     this.#moviesModel.updateMovie(updateType, update);
   };
 

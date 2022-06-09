@@ -16,30 +16,41 @@ export default class MoviesModel extends Observable {
     } catch(err) {
       this.#comments = [];
     }
-    this._notify(UpdateType.INIT);
   };
 
   get comments() {
     return this.#comments;
   }
 
-  deleteComment = (updateType, update) => {
+  deleteComment = async (updateType, update) => {
     const index = this.#comments.findIndex((comment) => comment.id === update.deletedCommentId);
     if (index === -1) {
       throw new Error('Can\'t update unexisting comment');
     }
 
-    this.#comments = [
-      ...this.#comments.slice(0, index),
-      ...this.#comments.slice(index + 1),
-    ];
-    update.deletedCommentId = '';
-    this._notify(updateType, update);
+    try {
+      await this.#moviesApiService.deleteComment(update.deletedCommentId);
+      this.#comments = [
+        ...this.#comments.slice(0, index),
+        ...this.#comments.slice(index + 1),
+      ];
+      delete update.deletedCommentId;
+    } catch(err) {
+      update.comments.push(update.deletedCommentId);
+      this._notify(UpdateType.PATCH, update);
+      throw new Error('Can\'t delete comment');
+    }
   };
 
-  addComment = (updateType, update) => {
-    this.#comments = [update.newComment, ...this.#comments];
-    update.newComment = '';
-    this._notify(updateType, update);
+  addComment = async (updateType, update) => {
+    try {
+      const updatedComments = await this.#moviesApiService.addComment(update);
+      this.#comments = [...updatedComments.comments];
+      delete update.newComment;
+      update = updatedComments.movie;
+    } catch(err) {
+      this._notify(UpdateType.PATCH, update);
+      throw new Error('Can\'t create new comment');
+    }
   };
 }
