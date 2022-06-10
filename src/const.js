@@ -20,8 +20,6 @@ const UpdateType = {
 
 const UserAction = {
   UPDATE_MOVIE: 'UPDATE_MOVIE',
-  // ADD_TASK: 'ADD_TASK',
-  // DELETE_TASK: 'DELETE_TASK',
 };
 
 export {FilterType, SortType, UpdateType, UserAction};

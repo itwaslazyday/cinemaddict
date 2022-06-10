@@ -7,7 +7,7 @@ import FilterPresenter from './presenter/filter-presenter.js';
 import BoardPresenter from './presenter/board-presenter.js';
 import MoviesApiService from './services/movies-api-service.js';
 
-const AUTHORIZATION = 'Basic crazymonkeys';
+const AUTHORIZATION = 'Basic tr8653jdasdw';
 const END_POINT = 'https://17.ecmascript.pages.academy/cinemaddict';
 
 const siteHeaderElement = document.querySelector('header');

@@ -13,6 +13,7 @@ import MoviePresenter from './movie-presenter.js';
 import {sortByDate, sortByRating} from '../utils/movie-date.js';
 import {SortType, UpdateType} from '../const.js';
 import {filter} from '../utils/filter.js';
+import {Errors} from '../services/movies-api-service.js';
 
 const MOVIES_COUNT_PER_STEP = 5;
 const MOVIES_COUNT_EXTRA = 2;
@@ -136,12 +137,29 @@ export default class BoardPresenter {
 
   #renderDownSideMovies = () => {
     const ratedMovies = this.#moviesModel.movies.slice().sort(sortByRating);
-    for (let i = 0; i < Math.min(ratedMovies.length, MOVIES_COUNT_EXTRA); i++) {
-      this.#renderMovie(ratedMovies[i], this.#ratedMoviesWrapperComponent, 'rated');
+    if (ratedMovies.length) {
+      if (!document.querySelector('.films-list--rated')) {
+        render(this.#ratedMoviesListComponent, this.#moviesBlockComponent.element, RenderPosition.AFTERBEGIN);
+        render(this.#ratedMoviesWrapperComponent, this.#ratedMoviesListComponent.element);
+      }
+      for (let i = 0; i < Math.min(ratedMovies.length, MOVIES_COUNT_EXTRA); i++) {
+        this.#renderMovie(ratedMovies[i], this.#ratedMoviesWrapperComponent, 'rated');
+      }
+    } else {
+      this.#ratedMoviesListComponent.element.remove();
     }
-    const commentedMovies = this.#moviesModel.movies.slice().sort((a, b) => b.comments.length - a.comments.length);
-    for (let i = 0; i < Math.min(commentedMovies.length, MOVIES_COUNT_EXTRA); i++) {
-      this.#renderMovie(commentedMovies[i], this.#commentedMoviesWrapperComponent, 'commented');
+    const commentedMovies = this.#moviesModel.movies.slice().sort((a, b) =>
+      b.comments.length - a.comments.length).filter((item) => item.comments.length !== 0);
+    if (commentedMovies.length) {
+      if (!document.querySelector('.films-list--commented')) {
+        render(this.#commentedMoviesListComponent, this.#moviesBlockComponent.element);
+        render(this.#commentedMoviesWrapperComponent, this.#commentedMoviesListComponent.element);
+      }
+      for (let i = 0; i < Math.min(commentedMovies.length, MOVIES_COUNT_EXTRA); i++) {
+        this.#renderMovie(commentedMovies[i], this.#commentedMoviesWrapperComponent, 'commented');
+      }
+    } else {
+      this.#commentedMoviesListComponent.element.remove();
     }
   };
 
@@ -219,6 +237,7 @@ export default class BoardPresenter {
 
   #handleViewAction = async (updateType, update) => {
     this.#moviesModel.popupRerender = true;
+    Object.keys(Errors).forEach((key) => {Errors[key] = false;});
     if (document.querySelector('.film-details')) {
       this.#moviesModel.popupScrollPosition = document.querySelector('.film-details').scrollTop;
     }

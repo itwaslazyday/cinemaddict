@@ -3,6 +3,7 @@ import PopupView from '../view/popup-view.js';
 import {render, RenderPosition, remove, replace} from '../framework/render.js';
 import {isEscapeKey} from '../utils/common.js';
 import {UpdateType} from '../const.js';
+import {Errors} from '../services/movies-api-service.js';
 
 const pageBody = document.querySelector('body');
 
@@ -26,8 +27,6 @@ export default class MoviePresenter {
 
   init = (movie) => {
     const prevMovieCard = this.#movieCard;
-    movie.deletingCommentError = false;
-    movie.addingCommentError = false;
     this.#movieCard  = new MovieCardView(movie);
     this.#movieCard.setClickHandler(this.#onMovieCardClick);
     this.#movieCard.setWatchlistClickHandler(this.#onWatchListClick);
@@ -46,13 +45,10 @@ export default class MoviePresenter {
     this.#popupCard = movie;
 
     if (document.querySelector('.film-details') && this.#moviesModel.popupRerender) {
-      this.#popupCard = this.#moviesModel.movies.find((item) => item.id === this.#moviesModel.popupId);
-      this.#popupCard.deletingCommentError = false;
-      this.#popupCard.addingCommentError = false;
-      if (movie.deletedCommentId) {this.#popupCard.deletingCommentError = true;}
-      if (movie.newComment) {this.#popupCard.addingCommentError = true;}
-      this.#onMovieCardClick(this.#popupCard);
+      this.#moviesModel.popupCard = this.#moviesModel.movies.find((item) => item.id === this.#moviesModel.popupId);
+      this.#onMovieCardClick(this.#moviesModel.popupCard);
       this.#moviesModel.popupRerender = false;
+      this.#moviesModel.key = true;
     }
   };
 
@@ -70,22 +66,28 @@ export default class MoviePresenter {
 
   #onWatchListClick = () => {
     this.#changeData(this.#filterModel.filter === 'all' ? UpdateType.PATCH : UpdateType.MAJOR,
-      {...this.#popupCard, userDetails: {...this.#popupCard.userDetails, watchlist: !this.#popupCard.userDetails.watchlist}});
+      document.querySelector('.film-details') && this.#moviesModel.key ?
+        {...this.#moviesModel.popupCard, userDetails: {...this.#moviesModel.popupCard.userDetails, watchlist: !this.#moviesModel.popupCard.userDetails.watchlist}} :
+        {...this.#popupCard, userDetails: {...this.#popupCard.userDetails, watchlist: !this.#popupCard.userDetails.watchlist}});
   };
 
   #onAlreadyWatchedClick = () => {
     this.#changeData(this.#filterModel.filter === 'all' ? UpdateType.PATCH : UpdateType.MAJOR,
-      {...this.#popupCard, userDetails: {...this.#popupCard.userDetails, alreadyWatched: !this.#popupCard.userDetails.alreadyWatched}});
+      document.querySelector('.film-details') && this.#moviesModel.key ?
+        {...this.#moviesModel.popupCard, userDetails: {...this.#moviesModel.popupCard.userDetails, alreadyWatched: !this.#moviesModel.popupCard.userDetails.alreadyWatched}} :
+        {...this.#popupCard, userDetails: {...this.#popupCard.userDetails, alreadyWatched: !this.#popupCard.userDetails.alreadyWatched}});
   };
 
   #onFavoriteClick = () => {
     this.#changeData(this.#filterModel.filter === 'all' ? UpdateType.PATCH : UpdateType.MAJOR,
-      {...this.#popupCard, userDetails: {...this.#popupCard.userDetails, favorite: !this.#popupCard.userDetails.favorite}});
+      document.querySelector('.film-details') && this.#moviesModel.key ?
+        {...this.#moviesModel.popupCard, userDetails: {...this.#moviesModel.popupCard.userDetails, favorite: !this.#moviesModel.popupCard.userDetails.favorite}} :
+        {...this.#popupCard, userDetails: {...this.#popupCard.userDetails, favorite: !this.#popupCard.userDetails.favorite}});
   };
 
   #onCommentDeleteClick = (deletedCommentId) => {
     this.#changeData(UpdateType.MAJOR,
-      {...this.#popupCard, comments: [...this.#popupCard.comments.filter((item) => item !== deletedCommentId)], deletedCommentId: deletedCommentId});
+      {...this.#popupCard, comments: [...this.#popupCard.comments.filter((item) => item !== deletedCommentId)], deletedCommentId: deletedCommentId, newComment: ''});
   };
 
   #onCommentFormSubmit = (newComment) => {
@@ -107,9 +109,11 @@ export default class MoviePresenter {
     pageBody.classList.toggle('hide-overflow');
     render(this.#moviePopup, pageBody.querySelector('footer'), RenderPosition.AFTEREND);
     this.#moviePopup.element.scrollTop = this.#moviesModel.popupScrollPosition;
+    Object.keys(Errors).forEach((key) => {Errors[key] = false;});
   };
 
   #onPopupCloseClick = () => {
+    this.#moviesModel.key = false;
     document.querySelector('.film-details').remove();
     pageBody.classList.toggle('hide-overflow');
     document.removeEventListener('keydown', this.#onPopupEscPress);
