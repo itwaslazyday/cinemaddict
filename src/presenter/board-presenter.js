@@ -213,7 +213,7 @@ export default class BoardPresenter {
       this.#renderSort(this.#sortComponent, this.#moviesBlockComponent.element, RenderPosition.BEFOREBEGIN);
     }
 
-    const moviesCount = this.movies.length;
+    // const moviesCount = this.movies.length;
 
     if (renderDownSideMovies) {
       this.#ratedMoviesPresenter.forEach((presenter) => presenter.destroy());
@@ -227,12 +227,7 @@ export default class BoardPresenter {
     remove(this.#loadMoreButtonComponent);
 
     if (resetRenderedMoviesCount) {
-      this.#renderedMoviesCount = MOVIES_COUNT_PER_STEP;
-    } else {
-      // this.#renderedMoviesCount = Math.max(moviesCount, MOVIES_COUNT_PER_STEP);
-      // this.#renderedMoviesCount = Math.min(moviesCount, this.#renderedMoviesCount);
-      this.#renderedMoviesCount = moviesCount;
-    }
+      this.#renderedMoviesCount = MOVIES_COUNT_PER_STEP;}
   };
 
   #handleViewAction = async (updateType, update) => {
