@@ -43,19 +43,6 @@ export default class MoviesModel extends Observable {
     }
   };
 
-  // deleteComment = (updateType, update) => {
-  //   const index = this.#comments.findIndex((comment) => comment.id === update.deletedCommentId);
-  //   if (index === -1) {
-  //     throw new Error('Can\'t update unexisting comment');
-  //   }
-
-  //   this.#comments = [
-  //     ...this.#comments.slice(0, index),
-  //     ...this.#comments.slice(index + 1),
-  //   ];
-  //   delete update.deletedCommentId;
-  // };
-
   addComment = async (updateType, update) => {
     try {
       const updatedComments = await this.#moviesApiService.addComment(update);

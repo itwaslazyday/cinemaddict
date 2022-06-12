@@ -20,8 +20,9 @@ const MOVIES_COUNT_EXTRA = 2;
 
 export default class BoardPresenter {
   #emptyMoviesListComponent = null;
+  #currentSortType = SortType.DEFAULT;
 
-  #sortComponent = new AppSortingView();
+  #sortComponent = new AppSortingView(this.#currentSortType);
   #moviesBlockComponent = new MoviesBlockView();
   #moviesListComponent = new MoviesListView();
   #ratedMoviesListComponent = new RatedMoviesListView();
@@ -40,7 +41,7 @@ export default class BoardPresenter {
   #moviesModel = null;
   #filterModel = null;
   #commentsModel = null;
-  #currentSortType = SortType.DEFAULT;
+  // #currentSortType = SortType.DEFAULT;
   #isLoading = true;
 
   constructor(moviesContainer, moviesModel, filterModel, commentsModel) {
@@ -99,11 +100,8 @@ export default class BoardPresenter {
 
   #renderSort = (component, container, position) => {
     render(component, container, position);
-    this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
-  };
-
-  #renderSiteFooter = (component, container, position) => {
-    render(component, container, position);
+    this.isSorting = false;
+    component.setSortTypeChangeHandler(this.#handleSortTypeChange);
   };
 
   #handleSortTypeChange = (sortType) => {
@@ -112,7 +110,11 @@ export default class BoardPresenter {
     }
 
     this.#currentSortType = sortType;
-    this.#handleMovieEvent(UpdateType.MINOR);
+    this.#handleMovieEvent(UpdateType.MINOR, this.isSorting = true);
+  };
+
+  #renderSiteFooter = (component, container, position) => {
+    render(component, container, position);
   };
 
   #renderMoviesPlace = () => {
@@ -199,21 +201,21 @@ export default class BoardPresenter {
     }
   };
 
-  #clearMoviesList = ({resetRenderedMoviesCount = false, resetSortType = false, renderDownSideMovies = false} = {}) => {
+  #clearMoviesList = ({resetRenderedMoviesCount = false, resetSortType = true, renderDownSideMovies = false} = {}) => {
     if (resetSortType) {
       this.#currentSortType = SortType.DEFAULT;
     }
 
+    remove(this.#sortComponent);
+
     if (this.movies.length === 0) {
       remove(this.#emptyMoviesListComponent);
-      remove(this.#sortComponent);
       this.#renderEmptyList(this.#filterModel.filter);
     } else {
       remove(this.#emptyMoviesListComponent);
+      this.#sortComponent = new AppSortingView(this.#currentSortType);
       this.#renderSort(this.#sortComponent, this.#moviesBlockComponent.element, RenderPosition.BEFOREBEGIN);
     }
-
-    // const moviesCount = this.movies.length;
 
     if (renderDownSideMovies) {
       this.#ratedMoviesPresenter.forEach((presenter) => presenter.destroy());
@@ -255,11 +257,11 @@ export default class BoardPresenter {
         }
         break;
       case UpdateType.MINOR:
-        this.#clearMoviesList({resetRenderedMoviesCount: true});
+        this.#clearMoviesList({resetRenderedMoviesCount: true, resetSortType: !this.isSorting});
         this.#renderUpSideMovies();
         break;
       case UpdateType.MAJOR:
-        this.#clearMoviesList({resetRenderedMoviesCount: false, renderDownSideMovies: true, resetSortType: true});
+        this.#clearMoviesList({resetRenderedMoviesCount: false, renderDownSideMovies: true, resetSortType: !update});
         this.#renderUpSideMovies();
         this.#renderDownSideMovies();
         break;
