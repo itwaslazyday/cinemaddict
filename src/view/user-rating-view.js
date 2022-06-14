@@ -1,15 +1,14 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
-const defineUserRating = (count) => {
-  if (count <= 10) {
-    return 'Novice';
-  }
+const rating = {
+  10: 'Novice',
+  20: 'Fan',
+  infinity: 'Movie Buff'
+};
 
-  if (count <= 20) {
-    return 'Fan';
-  }
-
-  return 'Movie Buff';
+const defineUserRating = (count) =>{
+  count = Math.ceil(count / 10) * 10;
+  return count <= 20 ? rating[count] : rating.infinity;
 };
 
 const createUserRatingTemplate = (count) => `<section class="header__profile profile">

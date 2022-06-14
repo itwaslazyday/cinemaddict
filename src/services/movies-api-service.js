@@ -7,7 +7,7 @@ const Method = {
   POST: 'POST'
 };
 
-const Errors = {
+const Error = {
   DELETING: false,
   ADDING: false,
   CHANGING: false
@@ -78,4 +78,4 @@ export default class MoviesApiService extends ApiService {
   };
 }
 
-export {Errors};
+export {Error};

@@ -3,7 +3,7 @@ import PopupView from '../view/popup-view.js';
 import {render, RenderPosition, remove, replace} from '../framework/render.js';
 import {isEscapeKey} from '../utils/common.js';
 import {UpdateType} from '../const.js';
-import {Errors} from '../services/movies-api-service.js';
+import {Error} from '../services/movies-api-service.js';
 
 const pageBody = document.querySelector('body');
 
@@ -57,9 +57,12 @@ export default class MoviePresenter {
   };
 
 
-  #onMovieCardClick = (card) => {
+  #onMovieCardClick = async (card) => {
     if (document.querySelector('.film-details')) {
+      if (!this.#moviesModel.popupRerender) {await this.#commentsModel.init(this.#movieCard.card);}
       this.#onPopupCloseClick();
+    } else {
+      await this.#commentsModel.init(this.#movieCard.card);
     }
     this.#renderPopup(card);
   };
@@ -87,16 +90,19 @@ export default class MoviePresenter {
 
   #onCommentDeleteClick = (deletedCommentId) => {
     this.#changeData(UpdateType.MAJOR,
-      {...this.#popupCard, comments: [...this.#popupCard.comments.filter((item) => item !== deletedCommentId)], deletedCommentId: deletedCommentId, newComment: ''});
+      document.querySelector('.film-details') && this.#moviesModel.key ?
+        {...this.#moviesModel.popupCard, comments: [...this.#moviesModel.popupCard.comments.filter((item) => item !== deletedCommentId)], deletedCommentId: deletedCommentId, newComment: ''} :
+        {...this.#popupCard, comments: [...this.#popupCard.comments.filter((item) => item !== deletedCommentId)], deletedCommentId: deletedCommentId, newComment: ''});
   };
 
   #onCommentFormSubmit = (newComment) => {
     this.#changeData(UpdateType.MAJOR,
-      {...this.#popupCard, newComment: newComment});
+      document.querySelector('.film-details') && this.#moviesModel.key ?
+        {...this.#moviesModel.popupCard, newComment: newComment, deletedCommentId: ''} :
+        {...this.#popupCard, newComment: newComment, deletedCommentId: ''});
   };
 
-  #renderPopup = async (card = this.#movieCard.card) => {
-    await this.#commentsModel.init(card);
+  #renderPopup = (card = this.#movieCard.card) => {
     this.#moviePopup = new PopupView(card, this.#commentsModel.comments);
     this.#moviesModel.popupId = this.#moviePopup.element.dataset.filmId;
     this.#moviePopup.setCloseClickHandler(this.#onPopupCloseClick);
@@ -109,7 +115,7 @@ export default class MoviePresenter {
     pageBody.classList.toggle('hide-overflow');
     render(this.#moviePopup, pageBody.querySelector('footer'), RenderPosition.AFTEREND);
     this.#moviePopup.element.scrollTop = this.#moviesModel.popupScrollPosition;
-    Object.keys(Errors).forEach((key) => {Errors[key] = false;});
+    Object.keys(Error).forEach((key) => {Error[key] = false;});
   };
 
   #onPopupCloseClick = () => {

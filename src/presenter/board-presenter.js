@@ -13,7 +13,7 @@ import MoviePresenter from './movie-presenter.js';
 import {sortByDate, sortByRating} from '../utils/movie-date.js';
 import {SortType, UpdateType} from '../const.js';
 import {filter} from '../utils/filter.js';
-import {Errors} from '../services/movies-api-service.js';
+import {Error} from '../services/movies-api-service.js';
 
 const MOVIES_COUNT_PER_STEP = 5;
 const MOVIES_COUNT_EXTRA = 2;
@@ -41,7 +41,6 @@ export default class BoardPresenter {
   #moviesModel = null;
   #filterModel = null;
   #commentsModel = null;
-  // #currentSortType = SortType.DEFAULT;
   #isLoading = true;
 
   constructor(moviesContainer, moviesModel, filterModel, commentsModel) {
@@ -234,11 +233,12 @@ export default class BoardPresenter {
 
   #handleViewAction = async (updateType, update) => {
     this.#moviesModel.popupRerender = true;
-    Object.keys(Errors).forEach((key) => {Errors[key] = false;});
+    Object.keys(Error).forEach((key) => {Error[key] = false;});
     if (document.querySelector('.film-details')) {
       this.#moviesModel.popupScrollPosition = document.querySelector('.film-details').scrollTop;
     }
-    if (update.deletedCommentId) { await this.#commentsModel.deleteComment(updateType, update);}
+    this.#commentsModel.init(update);
+    if (update.deletedCommentId) {await this.#commentsModel.deleteComment(updateType, update);}
     if (update.newComment) {await this.#commentsModel.addComment(updateType, update);}
     this.#moviesModel.updateMovie(updateType, update);
   };

@@ -1,7 +1,7 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {humanizeTaskDueDate, humanizeMovieRuntime} from '../utils/movie-date.js';
 import he from 'he';
-import {Errors} from '../services/movies-api-service.js';
+import {Error} from '../services/movies-api-service.js';
 
 const createPopupTemplate = (state, commentsArr) => {
   const {
@@ -148,11 +148,11 @@ export default class PopupView extends AbstractStatefulView {
     this.movieCard = movieCard;
     this.comments = comments;
     this._state = PopupView.parseMovieToState(movieCard);
-    this._state.errors = Errors;
+    this._state.errors = Error;
     this.#setInnerHandlers();
   }
 
-  get template() {
+  get template () {
     return createPopupTemplate(this._state, this.comments);
   }
 

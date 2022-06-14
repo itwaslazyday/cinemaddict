@@ -1,6 +1,6 @@
 import Observable from '../framework/observable.js';
 import {UpdateType} from '../const.js';
-import {Errors} from '../services/movies-api-service.js';
+import {Error} from '../services/movies-api-service.js';
 
 export default class MoviesModel extends Observable {
   #moviesApiService = null;
@@ -36,7 +36,7 @@ export default class MoviesModel extends Observable {
       ];
       delete update.deletedCommentId;
     } catch(err) {
-      Errors.DELETING = true;
+      Error.DELETING = true;
       update.comments.push(update.deletedCommentId);
       this._notify(UpdateType.PATCH, update);
       throw new Error('Can\'t delete comment');
@@ -50,7 +50,7 @@ export default class MoviesModel extends Observable {
       delete update.newComment;
       update = updatedComments.movie;
     } catch(err) {
-      Errors.ADDING = true;
+      Error.ADDING = true;
       this._notify(UpdateType.PATCH, update);
       throw new Error('Can\'t create new comment');
     }

@@ -1,6 +1,6 @@
 import Observable from '../framework/observable.js';
 import {UpdateType} from '../const.js';
-import {Errors} from '../services/movies-api-service.js';
+import {Error} from '../services/movies-api-service.js';
 
 export default class MoviesModel extends Observable {
   #moviesApiService = null;
@@ -73,7 +73,7 @@ export default class MoviesModel extends Observable {
       ];
       this._notify(updateType, update);
     } catch(err) {
-      Errors.CHANGING = true;
+      Error.CHANGING = true;
       update = this.movies.find((item) => item.id === update.id);
       this._notify(UpdateType.PATCH, update);
       throw new Error('Can\'t update movie');
