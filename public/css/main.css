@@ -404,16 +404,16 @@ button {
   padding-bottom: 0;
 }
 
-.films-list--extra:last-of-type {
+.films-list--extra:nth-of-type(2) {
   position: relative;
 }
 
-.films-list--extra:last-of-type::before {
+.films-list--extra:nth-of-type(2)::after {
   border-left: solid 1px var(--outline-color);
   bottom: 20px;
   content: '';
   height: calc(100% - 20px * 2);
-  left: calc(-1 * var(--horizontal-gap) * 1.5);
+  right: calc(var(--horizontal-gap));
   position: absolute;
   top: 20px;
   width: 0;
@@ -443,7 +443,7 @@ button {
   height: 100vh;
   top: 0;
   right: 0;
-  z-index: 1;
+  z-index: 10;
   background-color: #212126;
   box-shadow: -3px 2px 13px 0 #141628;
   overflow-x: hidden;

@@ -7,6 +7,12 @@ const Method = {
   POST: 'POST'
 };
 
+const Error = {
+  DELETING: false,
+  ADDING: false,
+  CHANGING: false
+};
+
 export default class MoviesApiService extends ApiService {
   get movies() {
     return this._load({url: 'movies'})
@@ -71,3 +77,5 @@ export default class MoviesApiService extends ApiService {
     return parsedResponse;
   };
 }
+
+export {Error};

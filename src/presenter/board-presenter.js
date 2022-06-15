@@ -13,14 +13,16 @@ import MoviePresenter from './movie-presenter.js';
 import {sortByDate, sortByRating} from '../utils/movie-date.js';
 import {SortType, UpdateType} from '../const.js';
 import {filter} from '../utils/filter.js';
+import {Error} from '../services/movies-api-service.js';
 
 const MOVIES_COUNT_PER_STEP = 5;
 const MOVIES_COUNT_EXTRA = 2;
 
 export default class BoardPresenter {
   #emptyMoviesListComponent = null;
+  #currentSortType = SortType.DEFAULT;
 
-  #sortComponent = new AppSortingView();
+  #sortComponent = new AppSortingView(this.#currentSortType);
   #moviesBlockComponent = new MoviesBlockView();
   #moviesListComponent = new MoviesListView();
   #ratedMoviesListComponent = new RatedMoviesListView();
@@ -39,7 +41,6 @@ export default class BoardPresenter {
   #moviesModel = null;
   #filterModel = null;
   #commentsModel = null;
-  #currentSortType = SortType.DEFAULT;
   #isLoading = true;
 
   constructor(moviesContainer, moviesModel, filterModel, commentsModel) {
@@ -98,11 +99,8 @@ export default class BoardPresenter {
 
   #renderSort = (component, container, position) => {
     render(component, container, position);
-    this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
-  };
-
-  #renderSiteFooter = (component, container, position) => {
-    render(component, container, position);
+    this.isSorting = false;
+    component.setSortTypeChangeHandler(this.#handleSortTypeChange);
   };
 
   #handleSortTypeChange = (sortType) => {
@@ -111,7 +109,11 @@ export default class BoardPresenter {
     }
 
     this.#currentSortType = sortType;
-    this.#handleMovieEvent(UpdateType.MINOR);
+    this.#handleMovieEvent(UpdateType.MINOR, this.isSorting = true);
+  };
+
+  #renderSiteFooter = (component, container, position) => {
+    render(component, container, position);
   };
 
   #renderMoviesPlace = () => {
@@ -136,12 +138,29 @@ export default class BoardPresenter {
 
   #renderDownSideMovies = () => {
     const ratedMovies = this.#moviesModel.movies.slice().sort(sortByRating);
-    for (let i = 0; i < Math.min(ratedMovies.length, MOVIES_COUNT_EXTRA); i++) {
-      this.#renderMovie(ratedMovies[i], this.#ratedMoviesWrapperComponent, 'rated');
+    if (ratedMovies.length) {
+      if (!document.querySelector('.films-list--rated')) {
+        render(this.#ratedMoviesListComponent, this.#moviesBlockComponent.element, RenderPosition.AFTERBEGIN);
+        render(this.#ratedMoviesWrapperComponent, this.#ratedMoviesListComponent.element);
+      }
+      for (let i = 0; i < Math.min(ratedMovies.length, MOVIES_COUNT_EXTRA); i++) {
+        this.#renderMovie(ratedMovies[i], this.#ratedMoviesWrapperComponent, 'rated');
+      }
+    } else {
+      this.#ratedMoviesListComponent.element.remove();
     }
-    const commentedMovies = this.#moviesModel.movies.slice().sort((a, b) => b.comments.length - a.comments.length);
-    for (let i = 0; i < Math.min(commentedMovies.length, MOVIES_COUNT_EXTRA); i++) {
-      this.#renderMovie(commentedMovies[i], this.#commentedMoviesWrapperComponent, 'commented');
+    const commentedMovies = this.#moviesModel.movies.slice().sort((a, b) =>
+      b.comments.length - a.comments.length).filter((item) => item.comments.length !== 0);
+    if (commentedMovies.length) {
+      if (!document.querySelector('.films-list--commented')) {
+        render(this.#commentedMoviesListComponent, this.#moviesBlockComponent.element);
+        render(this.#commentedMoviesWrapperComponent, this.#commentedMoviesListComponent.element);
+      }
+      for (let i = 0; i < Math.min(commentedMovies.length, MOVIES_COUNT_EXTRA); i++) {
+        this.#renderMovie(commentedMovies[i], this.#commentedMoviesWrapperComponent, 'commented');
+      }
+    } else {
+      this.#commentedMoviesListComponent.element.remove();
     }
   };
 
@@ -181,21 +200,21 @@ export default class BoardPresenter {
     }
   };
 
-  #clearMoviesList = ({resetRenderedMoviesCount = false, resetSortType = false, renderDownSideMovies = false} = {}) => {
+  #clearMoviesList = ({resetRenderedMoviesCount = false, resetSortType = true, renderDownSideMovies = false} = {}) => {
     if (resetSortType) {
       this.#currentSortType = SortType.DEFAULT;
     }
 
+    remove(this.#sortComponent);
+
     if (this.movies.length === 0) {
       remove(this.#emptyMoviesListComponent);
-      remove(this.#sortComponent);
       this.#renderEmptyList(this.#filterModel.filter);
     } else {
       remove(this.#emptyMoviesListComponent);
+      this.#sortComponent = new AppSortingView(this.#currentSortType);
       this.#renderSort(this.#sortComponent, this.#moviesBlockComponent.element, RenderPosition.BEFOREBEGIN);
     }
-
-    const moviesCount = this.movies.length;
 
     if (renderDownSideMovies) {
       this.#ratedMoviesPresenter.forEach((presenter) => presenter.destroy());
@@ -209,20 +228,17 @@ export default class BoardPresenter {
     remove(this.#loadMoreButtonComponent);
 
     if (resetRenderedMoviesCount) {
-      this.#renderedMoviesCount = MOVIES_COUNT_PER_STEP;
-    } else {
-      // this.#renderedMoviesCount = Math.max(moviesCount, MOVIES_COUNT_PER_STEP);
-      // this.#renderedMoviesCount = Math.min(moviesCount, this.#renderedMoviesCount);
-      this.#renderedMoviesCount = moviesCount;
-    }
+      this.#renderedMoviesCount = MOVIES_COUNT_PER_STEP;}
   };
 
   #handleViewAction = async (updateType, update) => {
     this.#moviesModel.popupRerender = true;
+    Object.keys(Error).forEach((key) => {Error[key] = false;});
     if (document.querySelector('.film-details')) {
       this.#moviesModel.popupScrollPosition = document.querySelector('.film-details').scrollTop;
     }
-    if (update.deletedCommentId) { await this.#commentsModel.deleteComment(updateType, update);}
+    this.#commentsModel.init(update);
+    if (update.deletedCommentId) {await this.#commentsModel.deleteComment(updateType, update);}
     if (update.newComment) {await this.#commentsModel.addComment(updateType, update);}
     this.#moviesModel.updateMovie(updateType, update);
   };
@@ -241,11 +257,11 @@ export default class BoardPresenter {
         }
         break;
       case UpdateType.MINOR:
-        this.#clearMoviesList({resetRenderedMoviesCount: true});
+        this.#clearMoviesList({resetRenderedMoviesCount: true, resetSortType: !this.isSorting});
         this.#renderUpSideMovies();
         break;
       case UpdateType.MAJOR:
-        this.#clearMoviesList({resetRenderedMoviesCount: false, renderDownSideMovies: true, resetSortType: true});
+        this.#clearMoviesList({resetRenderedMoviesCount: false, renderDownSideMovies: true, resetSortType: !update});
         this.#renderUpSideMovies();
         this.#renderDownSideMovies();
         break;
