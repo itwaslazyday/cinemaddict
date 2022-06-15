@@ -9,7 +9,7 @@ const createPopupTemplate = (state, commentsArr) => {
     userDetails: {watchlist, alreadyWatched, favorite},
     errors: {DELETING, ADDING, CHANGING},
     comments, tappedEmotionId, typedComment, isDeleting, deletedCommentId, isSaving} = state;
-  const createEmotion = () =>  (tappedEmotionId) ? `<img src="./images/emoji/${tappedEmotionId.split('-')[1]}.png" width="55" height="55" alt="emoji"></img>` : '';
+  const createEmotion = () =>  (tappedEmotionId) ? `<img src="./images/emoji/${tappedEmotionId.replace('emoji-', '')}.png" width="55" height="55" alt="emoji"></img>` : '';
   const createDescription = () => (typedComment) ? typedComment : '';
   const createGenres = () => genre.reduce((acc, gen) => (acc += `<span class="film-details__genre">${gen}</span>`), '');
   const getChecked = (emotion) => emotion === tappedEmotionId ? 'checked' : '';
@@ -138,7 +138,7 @@ const createPopupTemplate = (state, commentsArr) => {
 
 const createNewCommentTemplate = (evt, state) => ({
   'comment': evt.target.value,
-  'emotion': state.tappedEmotionId.split('-')[1]
+  'emotion': state.tappedEmotionId.replace('emoji-', '')
 });
 
 export default class PopupView extends AbstractStatefulView {
@@ -163,17 +163,9 @@ export default class PopupView extends AbstractStatefulView {
     this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#closeClickHandler, {once: true});
   };
 
-  #closeClickHandler = () => {
-    this._callback.popupCloseButtonClick();
-  };
-
   setWatchlistClickHandler = (callback) => {
     this._callback.toWatchListClick = callback;
     this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click', this.#watchListClickHandler);
-  };
-
-  #watchListClickHandler = () => {
-    this._callback.toWatchListClick();
   };
 
   setAlreadyWatchedClickHandler = (callback) => {
@@ -181,22 +173,45 @@ export default class PopupView extends AbstractStatefulView {
     this.element.querySelector('.film-details__control-button--watched').addEventListener('click', this.#alreadyWatchedClickHandler);
   };
 
-  #alreadyWatchedClickHandler = () => {
-    this._callback.alreadyWatchedClick();
-  };
-
   setFavoriteClickHandler = (callback) => {
     this._callback.favoriteClick = callback;
     this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#favoriteClickHandler);
   };
 
-  #favoriteClickHandler = () => {
-    this._callback.favoriteClick();
-  };
-
   setCommentDeleteClickHandler = (callback) => {
     this._callback.commentDeleteClick = callback;
     this.element.querySelector('.film-details__comments-list').addEventListener('click', this.#commentDeleteClickHandler);
+  };
+
+  setformSubmitHandler = (callback) => {
+    this._callback.commentFormSubmit = callback;
+    this.element.querySelector('.film-details__comment-input').addEventListener('keydown', this.#formSubmitHandler);
+  };
+
+  _restoreHandlers = () => {
+    this.#setInnerHandlers();
+    this.setWatchlistClickHandler(this._callback.toWatchListClick);
+    this.setAlreadyWatchedClickHandler(this._callback.alreadyWatchedClick);
+    this.setFavoriteClickHandler(this._callback.favoriteClick);
+    this.setCloseClickHandler(this._callback.popupCloseButtonClick);
+    this.setCommentDeleteClickHandler(this._callback.commentDeleteClick);
+    this.setformSubmitHandler(this._callback.commentFormSubmit);
+  };
+
+  #closeClickHandler = () => {
+    this._callback.popupCloseButtonClick();
+  };
+
+  #watchListClickHandler = () => {
+    this._callback.toWatchListClick();
+  };
+
+  #alreadyWatchedClickHandler = () => {
+    this._callback.alreadyWatchedClick();
+  };
+
+  #favoriteClickHandler = () => {
+    this._callback.favoriteClick();
   };
 
   #commentDeleteClickHandler = (evt) => {
@@ -210,11 +225,6 @@ export default class PopupView extends AbstractStatefulView {
     }
   };
 
-  setformSubmitHandler = (callback) => {
-    this._callback.commentFormSubmit = callback;
-    this.element.querySelector('.film-details__comment-input').addEventListener('keydown', this.#formSubmitHandler);
-  };
-
   #formSubmitHandler = (evt) => {
     if ((evt.keyCode === 10 || evt.keyCode === 13) && (evt.ctrlKey || evt.metaKey)) {
       evt.preventDefault();
@@ -223,16 +233,6 @@ export default class PopupView extends AbstractStatefulView {
       });
       this._callback.commentFormSubmit(createNewCommentTemplate(evt, this._state));
     }
-  };
-
-  _restoreHandlers = () => {
-    this.#setInnerHandlers();
-    this.setWatchlistClickHandler(this._callback.toWatchListClick);
-    this.setAlreadyWatchedClickHandler(this._callback.alreadyWatchedClick);
-    this.setFavoriteClickHandler(this._callback.favoriteClick);
-    this.setCloseClickHandler(this._callback.popupCloseButtonClick);
-    this.setCommentDeleteClickHandler(this._callback.commentDeleteClick);
-    this.setformSubmitHandler(this._callback.commentFormSubmit);
   };
 
   #setInnerHandlers = () => {

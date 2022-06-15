@@ -54,6 +54,7 @@ export default class MoviePresenter {
 
   destroy = () => {
     remove(this.#movieCard);
+    document.removeEventListener('keydown', this.#onPopupEscPress);
   };
 
 
