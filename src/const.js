@@ -18,8 +18,4 @@ const UpdateType = {
   INIT: 'INIT'
 };
 
-const UserAction = {
-  UPDATE_MOVIE: 'UPDATE_MOVIE',
-};
-
-export {FilterType, SortType, UpdateType, UserAction};
+export {FilterType, SortType, UpdateType};

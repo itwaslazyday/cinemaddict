@@ -2,7 +2,7 @@ import Observable from '../framework/observable.js';
 import {UpdateType} from '../const.js';
 import {Error} from '../services/movies-api-service.js';
 
-export default class MoviesModel extends Observable {
+export default class CommentsModel extends Observable {
   #moviesApiService = null;
   #comments = [];
 

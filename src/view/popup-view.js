@@ -1,14 +1,14 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import {humanizeTaskDueDate, humanizeMovieRuntime} from '../utils/movie-date.js';
+import {humanizeMovieDate, humanizeMovieRuntime, humanizeCommentDate} from '../utils/movie-date.js';
 import he from 'he';
 import {Error} from '../services/movies-api-service.js';
 
-const createPopupTemplate = (state, commentsArr) => {
+const createPopupTemplate = (state, comments) => {
   const {
     filmInfo: {title, totalRating, release, runtime, genre, poster, description, director, writers, actors, alternativeTitle},
     userDetails: {watchlist, alreadyWatched, favorite},
     errors: {DELETING, ADDING, CHANGING},
-    comments, tappedEmotionId, typedComment, isDeleting, deletedCommentId, isSaving} = state;
+    tappedEmotionId, typedComment, isDeleting, deletedCommentId, isSaving} = state;
   const createEmotion = () =>  (tappedEmotionId) ? `<img src="./images/emoji/${tappedEmotionId.replace('emoji-', '')}.png" width="55" height="55" alt="emoji"></img>` : '';
   const createDescription = () => (typedComment) ? typedComment : '';
   const createGenres = () => genre.reduce((acc, gen) => (acc += `<span class="film-details__genre">${gen}</span>`), '');
@@ -16,10 +16,9 @@ const createPopupTemplate = (state, commentsArr) => {
   const getControlClassName = (option) => option
     ? 'film-details__control-button--active'
     : '';
-  const selectedComments = commentsArr.filter(({id}) => comments.some((item) => item === id));
   const createCommentsTemplate = () => {
     const commentsList = document.createElement('ul');
-    selectedComments.forEach((item) => {
+    comments.forEach((item) => {
       commentsList.insertAdjacentHTML('beforeend',
         `<li class="film-details__comment">
           <span class="film-details__comment-emoji">
@@ -29,7 +28,7 @@ const createPopupTemplate = (state, commentsArr) => {
             <p class="film-details__comment-text">${he.encode(item.comment)}</p>
             <p class="film-details__comment-info">
               <span class="film-details__comment-author">${item.author}</span>
-              <span class="film-details__comment-day">${humanizeTaskDueDate(item.date, 'YYYY/MM/DD HH:mm')}</span>
+              <span class="film-details__comment-day">${humanizeCommentDate(item.date)}</span>
               <button class="film-details__comment-delete" data-comment-id=${item.id} ${isDeleting && item.id === deletedCommentId ? 'disabled' : ''}>
               ${isDeleting && item.id === deletedCommentId ? 'Deleting...' : 'Delete'}</button>
             </p>
@@ -77,7 +76,7 @@ const createPopupTemplate = (state, commentsArr) => {
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Release Date</td>
-                  <td class="film-details__cell">${humanizeTaskDueDate(release.date, 'DD MMMM YYYY')}</td>
+                  <td class="film-details__cell">${humanizeMovieDate(release.date, 'DD MMMM YYYY')}</td>
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Runtime</td>
@@ -155,8 +154,6 @@ export default class PopupView extends AbstractStatefulView {
   get template () {
     return createPopupTemplate(this._state, this.comments);
   }
-
-  static parseMovieToState = (movieCard) => ({...movieCard, tappedEmotionId: null});
 
   setCloseClickHandler = (callback) => {
     this._callback.popupCloseButtonClick = callback;
@@ -256,4 +253,6 @@ export default class PopupView extends AbstractStatefulView {
       });
     }
   };
+
+  static parseMovieToState = (movieCard) => ({...movieCard, tappedEmotionId: null});
 }

@@ -5,9 +5,11 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
 
-const humanizeTaskDueDate = (date, format) => dayjs(date).format(format);
+const humanizeMovieDate = (date, format) => dayjs(date).format(format);
 
 const humanizeMovieRuntime = (runTime, format) => dayjs.duration(runTime, 'minutes').format(format);
+
+const humanizeCommentDate = (date) => dayjs(date).fromNow();
 
 const getWeightForNullDate = (dateA, dateB) => {
   if (dateA === null && dateB === null) {
@@ -37,4 +39,4 @@ const sortByRating = (movieB, movieA) => {
   return weight ?? (movieA.filmInfo.totalRating - movieB.filmInfo.totalRating);
 };
 
-export {humanizeTaskDueDate, humanizeMovieRuntime, sortByDate, sortByRating};
+export {humanizeMovieDate, humanizeMovieRuntime, humanizeCommentDate, sortByDate, sortByRating};

@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import {humanizeTaskDueDate, humanizeMovieRuntime} from '../utils/movie-date.js';
+import {humanizeMovieDate, humanizeMovieRuntime} from '../utils/movie-date.js';
 
 const MAX_DESCRIPTION_LENGTH = 139;
 
@@ -18,7 +18,7 @@ const createMovieCardTemplate = (card) => {
         <h3 class="film-card__title">${title}</h3>
         <p class="film-card__rating">${totalRating}</p>
         <p class="film-card__info">
-          <span class="film-card__year">${humanizeTaskDueDate(release.date, 'YYYY')}</span>
+          <span class="film-card__year">${humanizeMovieDate(release.date, 'YYYY')}</span>
           <span class="film-card__duration">${humanizeMovieRuntime(runtime, runtime>60 ? 'H[h] m[m]' : 'm[m]')}</span>
           <span class="film-card__genre">${genre.length > 1 ? genre.join(', ') : genre}</span>
         </p>
@@ -46,7 +46,7 @@ export default class MovieCardView extends AbstractView {
     return createMovieCardTemplate(this.card);
   }
 
-  setClickHandler = (callback) => {
+  setMovieClickHandler = (callback) => {
     this._callback.movieCardClick = callback;
     this.element.querySelector('.film-card__link').addEventListener('click', this.#clickHandler);
   };
